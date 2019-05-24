@@ -7,7 +7,7 @@
 
 import React, {Component} from 'react';
 import {Platform} from 'react-native';
-import {loginView} from './views/login/View';
+import SignedOut from './views/login/signedOut';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,9 +18,8 @@ const instructions = Platform.select({
 
 type Props = {};
 export default class App extends Component<Props> {
+
   render() {
-    return (
-        loginView()
-    );
+    return <SignedOut />;
   }
 }
