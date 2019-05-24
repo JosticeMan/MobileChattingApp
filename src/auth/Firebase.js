@@ -97,6 +97,10 @@ function handleCUError(errorCode) {
     }
 }
 
+// Function that is used to have users sign in
+// @param email -- The email that was entered
+// @param password -- The password that was entered
+// @author Justin Yau
 function signIn(email, password) {
     firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
         // Handle Errors here.
@@ -106,6 +110,9 @@ function signIn(email, password) {
     });
 }
 
+// This function handles all the error codes that can be spawned by a sign in request
+// @param errorCode -- The code that was spawned by a firebase sign in request
+// @author Justin Yau
 function handleSIError(errorCode) {
     switch(errorCode) {
         case "auth/invalid-email":
@@ -126,6 +133,8 @@ function handleSIError(errorCode) {
     }
 }
 
+// This function will be used to sign users out of their current session
+// @author Justin Yau
 function signOut() {
     firebase.auth().signOut().then(function() {
         // Sign-out successful.
