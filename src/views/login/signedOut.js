@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button } from 'react-native-elements';
-import { newUser, signIn, FireErrorText } from '../../auth/Firebase.js';
+import { newUser, signIn } from '../../auth/Firebase.js';
 
 export default class SignedOut extends Component {
 
@@ -22,6 +22,18 @@ export default class SignedOut extends Component {
         this._isMounted = false;
     }
 
+    userInput = (text) => {
+        this.setState({username: text} )
+    }
+
+    passInput = (text) => {
+        this.setState( {password: text} )
+    }
+
+    updateMsg = (msg) => {
+        this.setState({errorMsg: msg});
+    }
+
     render() {
         const { navigation } = this.props;
 
@@ -37,8 +49,7 @@ export default class SignedOut extends Component {
                             color='black'
                         />
                     }
-                    onChangeText={(text) => this.setState({username: text, password: this.state.password,
-                        errorMsg: this.state.errorMsg})}
+                    onChangeText={this.userInput}
                 />
                 <Input
                     placeholder='password'
@@ -50,15 +61,14 @@ export default class SignedOut extends Component {
                         />
                     }
                     secureTextEntry={true}
-                    onChangeText={(text) => this.setState({username: this.state.username, password: text,
-                        errorMsg: this.state.errorMsg})}
+                    onChangeText={this.passInput}
                 />
 
                 <Button
                     title="Sign up"
                     onPress={() => {
                         if(this._isMounted) {
-                            newUser(this.state.username, this.state.password, function(status) {
+                            newUser(this.state.username, this.state.password, this.updateMsg, function(status) {
                                 if(status) {
                                     navigation.navigate("SignedIn");
                                 }
@@ -70,7 +80,7 @@ export default class SignedOut extends Component {
                     title="Sign in"
                     onPress={() => {
                         if(this._isMounted) {
-                            signIn(this.state.username, this.state.password, function(status) {
+                            signIn(this.state.username, this.state.password, this.updateMsg, function(status) {
                                 if(status) {
                                     navigation.navigate("SignedIn");
                                 }
@@ -78,7 +88,7 @@ export default class SignedOut extends Component {
                         }
                     }}
                 />
-                <FireErrorText />
+                <Text style={styles.errorMsg}>{this.state.errorMsg}</Text>
             </View>
         )
     };
@@ -90,5 +100,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
+    },
+    errorMsg: {
+        color: "red",
     },
 });
