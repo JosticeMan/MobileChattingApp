@@ -1,8 +1,9 @@
 /**
- * The main app that will be used to render in the App. The contained page
+ * The main app that will be used to render in the App.
  *
  * @format
  * @flow
+ * @authors Justin Yau
  */
 
 import React, {Component} from 'react';

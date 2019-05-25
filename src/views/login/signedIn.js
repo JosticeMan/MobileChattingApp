@@ -1,9 +1,16 @@
+/**
+ * Name: signedIn.js
+ * Description: This is the landing page after the user successfully logs in
+ * @author Justin Yau
+ */
+
 import React, { Component } from "react";
 import {Text, View} from "react-native";
 import { Button } from "react-native-elements";
 import { signOut } from "../../auth/Firebase.js";
 
 export default class SignedIn extends Component {
+
     render() {
         const { navigation } = this.props;
         return (

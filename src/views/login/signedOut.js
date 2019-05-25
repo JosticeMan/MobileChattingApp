@@ -1,3 +1,9 @@
+/**
+ * Name: signedOut.js
+ * Description: This component will be displayed when the user first enters the app as they need to log in
+ * @authors Justin Yau
+ */
+
 import React, { Component } from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -22,14 +28,17 @@ export default class SignedOut extends Component {
         this._isMounted = false;
     }
 
+    // This will be used whenever the user changes the text input for username
     userInput = (text) => {
         this.setState({username: text} )
     }
 
+    // This will be used whenever the user changes the text input for password
     passInput = (text) => {
         this.setState( {password: text} )
     }
 
+    // This will be used to update the errorMsg after a API call
     updateMsg = (msg) => {
         this.setState({errorMsg: msg});
     }
