@@ -11,6 +11,7 @@ import { Platform, View, Text } from 'react-native';
 import { isSignedIn } from './auth/Firebase.js';
 import { createAppContainer } from 'react-navigation';
 import { createNavigator } from "./route/router.js";
+import ignoreWarnings from 'react-native-ignore-warnings';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -36,9 +37,10 @@ export default class App extends Component<Props> {
         .catch(() => alert("An error occurred when checking signIn status."));
   }
 
-
   render() {
     const {signedIn, checkedStatus} = this.state;
+    ignoreWarnings('Setting a timer');
+
     if(!checkedStatus) {
       return null;
     }

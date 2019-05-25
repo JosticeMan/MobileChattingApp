@@ -16,6 +16,7 @@ export default class SignedOut extends Component {
 
     state = {
         username: "",
+        email: "",
         password: "",
         errorMsg: "",
     };
@@ -28,9 +29,9 @@ export default class SignedOut extends Component {
         this._isMounted = false;
     }
 
-    // This will be used whenever the user changes the text input for username
-    userInput = (text) => {
-        this.setState({username: text} )
+    // This will be used whenever the user changes the text input for email
+    emailInput = (text) => {
+        this.setState({email: text} )
     }
 
     // This will be used whenever the user changes the text input for password
@@ -53,12 +54,12 @@ export default class SignedOut extends Component {
                     placeholder='email'
                     leftIcon={
                         <Icon
-                            name='user'
+                            name='envelope'
                             size={24}
                             color='black'
                         />
                     }
-                    onChangeText={this.userInput}
+                    onChangeText={this.emailInput}
                 />
                 <Input
                     placeholder='password'
@@ -77,7 +78,7 @@ export default class SignedOut extends Component {
                     title="Sign up"
                     onPress={() => {
                         if(this._isMounted) {
-                            newUser(this.state.username, this.state.password, this.updateMsg, function(status) {
+                            newUser(this.state.email, this.state.password, this.updateMsg, function(status) {
                                 if(status) {
                                     navigation.navigate("SignedIn");
                                 }
@@ -89,7 +90,7 @@ export default class SignedOut extends Component {
                     title="Sign in"
                     onPress={() => {
                         if(this._isMounted) {
-                            signIn(this.state.username, this.state.password, this.updateMsg, function(status) {
+                            signIn(this.state.email, this.state.password, this.updateMsg, function(status) {
                                 if(status) {
                                     navigation.navigate("SignedIn");
                                 }

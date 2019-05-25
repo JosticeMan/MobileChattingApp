@@ -121,6 +121,28 @@ function handleSIError(errorCode) {
     }
 }
 
+function hasName(callback) {
+    const userId = firebase.auth().currentUser.uid;
+    firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
+        if(snapshot.exists()) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
+}
+
+function setUsername(username, callback) {
+    const userId = firebase.auth().currentUser.uid;
+    firebase.database().ref('users/' + userId).set({
+        username: username,
+    }).then(() => {
+        callback(true);
+    }).catch(() => {
+        callback(false);
+    });
+}
+
 // This function will be used to sign users out of their current session
 // @author Justin Yau
 function signOut(callback) {
@@ -133,4 +155,4 @@ function signOut(callback) {
     });
 }
 
-module.exports = {isSignedIn, newUser, signIn, signOut}
+module.exports = {isSignedIn, newUser, signIn, signOut, hasName, setUsername};
