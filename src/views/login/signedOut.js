@@ -5,16 +5,26 @@ import { Input, Button } from 'react-native-elements';
 import { newUser, signIn, FireErrorText } from '../../auth/Firebase.js';
 
 export default class SignedOut extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: "",
-            password: "",
-            errorMsg: "",
-        };
+
+    _isMounted = false;
+
+    state = {
+        username: "",
+        password: "",
+        errorMsg: "",
+    };
+
+    componentDidMount(): void {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     render() {
+        const { navigation } = this.props;
+
         return (
             <View style={styles.container}>
                 <Text style={styles.welcome}>Welcome to Mino!</Text>
@@ -46,14 +56,31 @@ export default class SignedOut extends Component {
 
                 <Button
                     title="Sign up"
-                    onPress={() => newUser(this.state.username, this.state.password)}
+                    onPress={() => {
+                        if(this._isMounted) {
+                            newUser(this.state.username, this.state.password, function(status) {
+                                if(status) {
+                                    navigation.navigate("SignedIn");
+                                }
+                            })
+                        }
+                    }}
                 />
                 <Button
                     title="Sign in"
-                    onPress={() => signIn(this.state.username, this.state.password)}
+                    onPress={() => {
+                        if(this._isMounted) {
+                            signIn(this.state.username, this.state.password, function(status) {
+                                if(status) {
+                                    navigation.navigate("SignedIn");
+                                }
+                            })
+                        }
+                    }}
                 />
                 <FireErrorText />
-            </View> )
+            </View>
+        )
     };
 }
 
