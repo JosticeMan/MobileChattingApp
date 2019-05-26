@@ -153,13 +153,68 @@ function setUsername(username, callback) {
     });
 }
 
-function addConversation(email, callback) {
+// This function is used to determine whether the user already has a conversation with the target person
+// @param otherId -- The target id that the user wants to add
+// @param callback -- The function to be called to return results
+// @author Justin Yau
+function hasConversation(otherId, callback) {
     const userId = firebase.auth().currentUser.uid;
-    firebase.database().ref("/users/").orderByChild("email").equalTo(email).on("value", function(snapshot) {
-       snapshot.forEach(
-       function(childSnapshot) {
-          alert(childSnapshot.val().userId);
+    firebase.database().ref("/conversations/" + userId + "/" + otherId).once("value").then((snapshot) => {
+        if(snapshot.exists()) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
+}
+
+// This function is used to attempt to start a conversation with a target person
+// @param email -- The email of the person that the user wants to start a conversation with
+// @param username -- The username of the user
+// @param callback -- The function to be called once results are determined
+// @param dupe_callback -- The function to be called in the case that the user already made a request
+// @param self_callback -- The function to be called in the case that the user wants to talk to themselves
+// @author Justin Yau
+function addConversation(email, username, callback, dupe_callback, self_callback) {
+    const userId = firebase.auth().currentUser.uid;
+    firebase.database().ref("/users/").orderByChild("email").equalTo(email).once("value").then((snapshot) => {
+       var exists = false;
+       var self = false;
+       snapshot.forEach(function(childSnapshot) {
+           const val = childSnapshot.val();
+           if(val.userId === userId && !self) {
+               self = true;
+               exists = true;
+               self_callback();
+               return;
+           }
+           else if(!(val.userId === userId) && !exists) {
+               exists = true;
+               hasConversation(val.userId, (status) => {
+                   if (status) {
+                       dupe_callback();
+                       return;
+                   } else {
+                       firebase.database().ref("/conversations/" + userId + "/" + val.userId).set({
+                           other_username: val.username,
+                           other_email: val.email,
+                           other_userId: val.userId,
+                           other_accept: false,
+                       }).catch();
+                       firebase.database().ref("/conversations/" + val.userId + "/" + userId).set({
+                           other_username: username,
+                           other_email: firebase.auth().currentUser.email,
+                           other_userId: userId,
+                           other_accept: true,
+                       }).catch();
+                       callback(true, val.username);
+                       return;
+                   }
+           })}
        });
+       if(!exists) {
+           callback(false);
+       }
     });
 }
 

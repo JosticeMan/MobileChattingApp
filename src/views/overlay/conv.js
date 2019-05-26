@@ -32,7 +32,17 @@ export default class Con extends Component {
                 <Button
                     title="Submit"
                     onPress={() => {
-                        addConversation(this.state.emailInput);
+                        addConversation(this.state.emailInput, this.props.username, (status, username) => {
+                            if(status) {
+                                alert("You have sent " + username + " a request.");
+                            } else {
+                                alert("The email does not exist in the chat database.");
+                            }
+                        }, () => {
+                            alert("You already requested/have this person in your conversations!");
+                        }, () => {
+                            alert("You cannot add yourself!");
+                        });
                     }}
                 />
             </View>

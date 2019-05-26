@@ -81,7 +81,7 @@ export default class Chat extends Component {
                   isVisible={this.state.isVisible}
                   onBackdropPress={() => this.setState({ isVisible: false })}
               >
-                  <Con />
+                  <Con username={this.state.username}/>
               </Overlay>
           </View>
         );
