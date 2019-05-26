@@ -121,25 +121,45 @@ function handleSIError(errorCode) {
     }
 }
 
+// This function will be used to determine whether the user has already determined a username earlier
+// @param callback -- The function to be called once the search is made
+// @author Justin Yau
 function hasName(callback) {
     const userId = firebase.auth().currentUser.uid;
     firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
         if(snapshot.exists()) {
-            callback(true);
+            callback(true, snapshot.val().username);
         } else {
-            callback(false);
+            callback(false, "");
         }
     });
 }
 
+// This function will be used to set the username specified by the user when
+// @param username -- The username that was inputted
+// @param callback -- The function to be called once the operation is completed
+// @author Justn Yau
 function setUsername(username, callback) {
     const userId = firebase.auth().currentUser.uid;
+    const userEmail = firebase.auth().currentUser.email;
     firebase.database().ref('users/' + userId).set({
         username: username,
+        email: userEmail,
+        userId: userId,
     }).then(() => {
         callback(true);
     }).catch(() => {
         callback(false);
+    });
+}
+
+function addConversation(email, callback) {
+    const userId = firebase.auth().currentUser.uid;
+    firebase.database().ref("/users/").orderByChild("email").equalTo(email).on("value", function(snapshot) {
+       snapshot.forEach(
+       function(childSnapshot) {
+          alert(childSnapshot.val().userId);
+       });
     });
 }
 
@@ -155,4 +175,4 @@ function signOut(callback) {
     });
 }
 
-module.exports = {isSignedIn, newUser, signIn, signOut, hasName, setUsername};
+module.exports = {isSignedIn, newUser, signIn, signOut, hasName, setUsername, addConversation};
