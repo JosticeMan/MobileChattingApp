@@ -13,7 +13,9 @@ import React from 'react';
 // The configuration of the actual login credentials to access firebase.
 // Must be updated to adhere a commercial config once released.
 var firebaseConfig = {
+
 };
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
@@ -249,7 +251,7 @@ function accept_request(o_usr_id) {
     const userId = firebase.auth().currentUser.uid;
     firebase.database().ref("/conversations/" + userId + "/" + o_usr_id).update({you_accept: true}).catch();
     firebase.database().ref("/conversations/" + o_usr_id + "/" + userId).update({other_accept: true}).catch();
-    alert("You have accepted the request! Refresh to start chatting!");
+    alert("You have accepted the request!");
 }
 
 // This function will be used to sign users out of their current session
