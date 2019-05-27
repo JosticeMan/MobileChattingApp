@@ -54,7 +54,7 @@ export default class Chat extends Component {
         this.setState({ isVisible: status});
     }
 
-    _renderCon = function({item}) {
+    _renderCon = ({item}) => {
         if(item.other_accept && item.you_accept) { // Both added
             return (
                 <TouchableOpacity>
@@ -65,6 +65,11 @@ export default class Chat extends Component {
             return (
                 <TouchableOpacity onPress={() => {
                     accept_request(item.other_userId);
+                    this.clearCon();
+                    closeConversations();
+                    buildConversations((chat) => {
+                        this.addCon(chat);
+                    });
                 }}>
                     <Text>{item.other_username} wants to chat with you! Press to accept!</Text>
                 </TouchableOpacity>

@@ -13,7 +13,6 @@ import React from 'react';
 // The configuration of the actual login credentials to access firebase.
 // Must be updated to adhere a commercial config once released.
 var firebaseConfig = {
-
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
