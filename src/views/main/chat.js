@@ -9,7 +9,7 @@ import {Header} from "react-native-elements";
 import { hasName } from "../../auth/Firebase.js";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Overlay } from 'react-native-elements';
-import { setUsername, buildConversations, closeConversations } from "../../auth/Firebase";
+import { setUsername, buildConversations, accept_request, closeConversations } from "../../auth/Firebase";
 import Con from "../overlay/conv.js";
 
 export default class Chat extends Component {
@@ -23,7 +23,11 @@ export default class Chat extends Component {
     }
 
     addCon = (chat) => {
-        this.setState({conversations: [...this.state.conversations, chat]})
+        this.setState({conversations: [...this.state.conversations, chat]});
+    }
+
+    clearCon = () => {
+        this.setState({conversations: []});
     }
 
     componentDidMount(): void {
@@ -59,8 +63,10 @@ export default class Chat extends Component {
             );
         } else if(item.other_accept && !item.you_accept) { // You haven't accepted
             return (
-                <TouchableOpacity>
-                    <Text>{item.other_username} wants to chat with you! </Text>
+                <TouchableOpacity onPress={() => {
+                    accept_request(item.other_userId);
+                }}>
+                    <Text>{item.other_username} wants to chat with you! Press to accept!</Text>
                 </TouchableOpacity>
             );
         } else { // The other person hasn't added you yet
@@ -102,6 +108,13 @@ export default class Chat extends Component {
         return (
           <View>
               <Header
+                leftComponent={<Button icon={<Icon name="refresh"/>} onPress={() => {
+                    this.clearCon();
+                    closeConversations();
+                    buildConversations((chat) => {
+                        this.addCon(chat);
+                    });
+                }}/>}
                 centerComponent={{text: "Chat", style: { color: '#fff' }}}
                 rightComponent={<Button icon={<Icon name="plus"/>} onPress={()=>{
                     this.updateVisible(true);

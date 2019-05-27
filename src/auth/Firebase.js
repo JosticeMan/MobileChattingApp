@@ -220,6 +220,9 @@ function addConversation(email, username, callback, dupe_callback, self_callback
     });
 }
 
+// This function is used to build and then listen all conversations that are initially and added to the user's list
+// @param callback -- The function to be called to add the new conversation into the list
+// @author Justin Yau
 function buildConversations(callback) {
     const userId = firebase.auth().currentUser.uid;
     firebase.database().ref("/conversations/" + userId).on("child_added", (snapshot) => {
@@ -233,9 +236,21 @@ function buildConversations(callback) {
     });
 }
 
+// This function is used to close the connection that is listening for updates in conversations
+// @author Justin Yau
 function closeConversations() {
     const userId = firebase.auth().currentUser.uid;
     firebase.database().ref("/conversations/" + userId).off();
+}
+
+// This function handles the request to accept a conversation request
+// @param o_usr_id -- The id of the other user to accept the request from
+// @author Justin Yau
+function accept_request(o_usr_id) {
+    const userId = firebase.auth().currentUser.uid;
+    firebase.database().ref("/conversations/" + userId + "/" + o_usr_id).update({you_accept: true}).catch();
+    firebase.database().ref("/conversations/" + o_usr_id + "/" + userId).update({other_accept: true}).catch();
+    alert("You have accepted the request! Refresh to start chatting!");
 }
 
 // This function will be used to sign users out of their current session
@@ -252,4 +267,4 @@ function signOut(callback) {
 }
 
 module.exports = {isSignedIn, newUser, signIn, signOut, hasName,
-    setUsername, addConversation, buildConversations, closeConversations};
+    setUsername, addConversation, buildConversations, accept_request, closeConversations};
