@@ -6,12 +6,28 @@
  */
 
 import React from "react";
-import { createSwitchNavigator, createBottomTabNavigator, createAppContainer } from "react-navigation";
+import { createSwitchNavigator, createBottomTabNavigator, createAppContainer, createStackNavigator } from "react-navigation";
 import SignedOut from "../views/login/signedOut.js";
 import SignedIn from "../views/login/signedIn.js";
 import Store from "../views/main/store.js";
 import Chat from "../views/main/chat.js";
+import ChatScreen from "../views/chat/chatScreen.js";
 import { Icon } from 'react-native-elements';
+
+// This navigator will be used to switch between the conversation list and individual chat pages
+export const createStackNav = () => {
+    return (createStackNavigator({
+        Chat: {
+            screen: Chat,
+        },
+        ChatScreen: {
+            screen: ChatScreen,
+        }
+    }, {
+        initialRouteName: "Chat",
+    }))
+}
+
 
 // This will be used as the logged in homepage navigator
 // @author Justin Yau
@@ -36,7 +52,7 @@ export const createTabNavigator = () => {
            }
        },
        Chat: {
-           screen: Chat,
+           screen: createStackNav(),
            navigationOptions: {
                tabBarLabel: "Chat",
                tabBarIcon: ({ tintColor }) => (

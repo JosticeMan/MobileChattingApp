@@ -14,6 +14,12 @@ import Con from "../overlay/conv.js";
 
 export default class Chat extends Component {
 
+    static navigationOptions = ({navigation}) => {
+        return {
+            header: null,
+        };
+    };
+
     state = {
         hasUsername: false,
         username: "",
@@ -55,9 +61,12 @@ export default class Chat extends Component {
     }
 
     _renderCon = ({item}) => {
+        const { navigation } = this.props;
         if(item.other_accept && item.you_accept) { // Both added
             return (
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate("ChatScreen", item);
+                }}>
                     <Text>{item.other_username}</Text>
                 </TouchableOpacity>
             );
