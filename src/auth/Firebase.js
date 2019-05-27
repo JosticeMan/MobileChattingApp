@@ -200,12 +200,14 @@ function addConversation(email, username, callback, dupe_callback, self_callback
                            other_email: val.email,
                            other_userId: val.userId,
                            other_accept: false,
+                           you_accept: true,
                        }).catch();
                        firebase.database().ref("/conversations/" + val.userId + "/" + userId).set({
                            other_username: username,
                            other_email: firebase.auth().currentUser.email,
                            other_userId: userId,
                            other_accept: true,
+                           you_accept: false,
                        }).catch();
                        callback(true, val.username);
                        return;
@@ -218,9 +220,28 @@ function addConversation(email, username, callback, dupe_callback, self_callback
     });
 }
 
+function buildConversations(callback) {
+    const userId = firebase.auth().currentUser.uid;
+    firebase.database().ref("/conversations/" + userId).on("child_added", (snapshot) => {
+        const val = snapshot.val();
+        callback({
+            other_userId: val.other_userId,
+            other_username: val.other_username,
+            other_accept: val.other_accept,
+            you_accept: val.you_accept,
+        });
+    });
+}
+
+function closeConversations() {
+    const userId = firebase.auth().currentUser.uid;
+    firebase.database().ref("/conversations/" + userId).off();
+}
+
 // This function will be used to sign users out of their current session
 // @author Justin Yau
 function signOut(callback) {
+    closeConversations();
     firebase.auth().signOut().then(function() {
         // Sign-out successful.
         callback(true);
@@ -230,4 +251,5 @@ function signOut(callback) {
     });
 }
 
-module.exports = {isSignedIn, newUser, signIn, signOut, hasName, setUsername, addConversation};
+module.exports = {isSignedIn, newUser, signIn, signOut, hasName,
+    setUsername, addConversation, buildConversations, closeConversations};

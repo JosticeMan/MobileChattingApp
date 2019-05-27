@@ -4,12 +4,12 @@
  * @author Justin Yau
  */
 import React, { Component } from "react";
-import {Text, View} from "react-native";
+import {Text, View, FlatList, TouchableOpacity} from "react-native";
 import {Header} from "react-native-elements";
 import { hasName } from "../../auth/Firebase.js";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Overlay } from 'react-native-elements';
-import { setUsername } from "../../auth/Firebase";
+import { setUsername, buildConversations, closeConversations } from "../../auth/Firebase";
 import Con from "../overlay/conv.js";
 
 export default class Chat extends Component {
@@ -19,6 +19,11 @@ export default class Chat extends Component {
         username: "",
         isVisible: false,
         emailInput: "",
+        conversations: [],
+    }
+
+    addCon = (chat) => {
+        this.setState({conversations: [...this.state.conversations, chat]})
     }
 
     componentDidMount(): void {
@@ -27,6 +32,9 @@ export default class Chat extends Component {
                 this.setState({username: stored});
             }
             this.setState({hasUsername: status});
+        });
+        buildConversations((chat) => {
+            this.addCon(chat);
         });
     }
 
@@ -40,6 +48,28 @@ export default class Chat extends Component {
 
     updateVisible = (status) => {
         this.setState({ isVisible: status});
+    }
+
+    _renderCon = function({item}) {
+        if(item.other_accept && item.you_accept) { // Both added
+            return (
+                <TouchableOpacity>
+                    <Text>{item.other_username}</Text>
+                </TouchableOpacity>
+            );
+        } else if(item.other_accept && !item.you_accept) { // You haven't accepted
+            return (
+                <TouchableOpacity>
+                    <Text>{item.other_username} wants to chat with you! </Text>
+                </TouchableOpacity>
+            );
+        } else { // The other person hasn't added you yet
+            return (
+                <TouchableOpacity>
+                    <Text>{item.other_username} (Hasn't added you yet!)</Text>
+                </TouchableOpacity>
+            );
+        }
     }
 
     render() {
@@ -83,6 +113,11 @@ export default class Chat extends Component {
               >
                   <Con username={this.state.username}/>
               </Overlay>
+              <FlatList
+                    data={this.state.conversations}
+                    renderItem={this._renderCon}
+                    keyExtractor={(item) => item.other_userId}
+              />
           </View>
         );
     }
