@@ -202,6 +202,7 @@ function addConversation(email, username, callback, dupe_callback, self_callback
                            other_userId: val.userId,
                            other_accept: false,
                            you_accept: true,
+                           your_username: username,
                        }).catch();
                        firebase.database().ref("/conversations/" + val.userId + "/" + userId).set({
                            other_username: username,
@@ -209,6 +210,7 @@ function addConversation(email, username, callback, dupe_callback, self_callback
                            other_userId: userId,
                            other_accept: true,
                            you_accept: false,
+                           your_username: val.username,
                        }).catch();
                        callback(true, val.username);
                        return;
@@ -233,6 +235,7 @@ function buildConversations(callback) {
             other_username: val.other_username,
             other_accept: val.other_accept,
             you_accept: val.you_accept,
+            your_username: val.your_username,
         });
     });
 }
@@ -254,6 +257,63 @@ function accept_request(o_usr_id) {
     alert("You have accepted the request!");
 }
 
+// This function returns the user id of the user that is currently logged in
+// @author Justin Yau
+function getUID() {
+    return firebase.auth().currentUser.uid;
+}
+
+// This function loads all the messages that are currently in the database and listens for new messages
+// @param callback -- The function to be called when a new message is detected
+// @param other_userId -- The user id of the user that the user is talking to
+// @author Justin Yau
+function loadMessages(callback, other_userId) {
+    const userId = firebase.auth().currentUser.uid;
+    let messageRef = firebase.database().ref('messages').child(userId).child(other_userId);
+    messageRef.off();
+    messageRef.on("child_added", (snapshot) => {
+       const val = snapshot.val();
+       callback({
+           _id: snapshot.key,
+          text: val.text,
+          user: {
+              _id: val.user._id,
+              username: val.user.username,
+          },
+          createdAt: val.createdAt,
+       });
+    });
+}
+
+// This function closes the listener that was looking for new messages
+// @param other_userId -- The user id of the user that the user is talking to
+// @author Justin Yau
+function closeChat(other_userId) {
+    const userId = firebase.auth().currentUser.uid;
+    let messageRef = firebase.database().ref('/messages/' + userId + "/" + other_userId);
+    messageRef.off();
+}
+
+// This function adds the sent message into the database
+// @param message -- The message that was sent by gifted chat
+// @param other_userId -- The user id of the user that the user is talking to
+// @author Justin Yau
+function sendMessage(message, other_userId) {
+    const userId = firebase.auth().currentUser.uid;
+    for (let i = 0; i < message.length; i++) {
+        let msgId = firebase.database().ref("messages").child(userId).child(other_userId).push().key;
+        let updates = {};
+        let msg = {
+            text: message[i].text,
+            user: message[i].user,
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+        };
+        updates["/messages/" + userId + "/" + other_userId + "/" + msgId] = msg;
+        updates["/messages/" + other_userId + "/" + userId + "/" + msgId] = msg;
+        firebase.database().ref().update(updates).catch();
+    }
+}
+
 // This function will be used to sign users out of their current session
 // @author Justin Yau
 function signOut(callback) {
@@ -268,4 +328,5 @@ function signOut(callback) {
 }
 
 module.exports = {isSignedIn, newUser, signIn, signOut, hasName,
-    setUsername, addConversation, buildConversations, accept_request, closeConversations};
+    setUsername, addConversation, buildConversations, accept_request, closeConversations,
+    getUID, sendMessage, loadMessages, closeChat};
