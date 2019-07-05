@@ -50,6 +50,8 @@ export default class chatScreen extends Component {
                     _id: getUID(),
                     username: navigation.getParam('your_username', null),
                 }}
+                inverted={false}
+                scrollToBottom={true}
             />
         );
     }
